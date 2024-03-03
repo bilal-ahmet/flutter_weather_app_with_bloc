@@ -8,7 +8,7 @@ class selectCityWidget extends StatefulWidget {
 }
 
 class _selectCityWidgetState extends State<selectCityWidget> {
-  TextEditingController _textController = TextEditingController();
+  final TextEditingController _textController = TextEditingController();
 
   @override
   Widget build(BuildContext context) {

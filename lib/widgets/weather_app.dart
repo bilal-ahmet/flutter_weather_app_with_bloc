@@ -20,7 +20,7 @@ class WeatherApp extends StatelessWidget {
           IconButton(onPressed: () async{
 
             // selectCity'de pop geriye _textController.text ile veri veriyor bu veriyi await ile bekleyip değişkene atadık
-            pickedCity = await Navigator.push(context, MaterialPageRoute(builder: (context) => const selectCityWidget())); print(pickedCity);
+            pickedCity = await Navigator.push(context, MaterialPageRoute(builder: (context) => const selectCityWidget()));
           }, icon: const Icon(Icons.search, color: Colors.white,))
         ],
       ),
@@ -28,18 +28,18 @@ class WeatherApp extends StatelessWidget {
         child: ListView(
           children: [
             Padding(
-              padding: EdgeInsets.all(8.0),
+              padding: const EdgeInsets.all(8.0),
               child: Center(child: LocationWidget(city: pickedCity!),),
             ),
-            Padding(
+            const Padding(
               padding: EdgeInsets.all(8.0),
               child: Center(child: LastUpdateWidget()),
             ),
-            Padding(
+            const Padding(
               padding: EdgeInsets.all(8.0),
               child: Center(child: WeatherPictureWidget()),
             ),
-            Padding(
+            const Padding(
               padding: EdgeInsets.all(8.0),
               child: Center(child: MaxMinTemperatureWidget()),
             ),
