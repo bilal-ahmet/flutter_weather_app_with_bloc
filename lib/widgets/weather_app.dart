@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:flutter_weather_app_with_bloc/blocs/bloc/weather_bloc.dart';
 import 'package:flutter_weather_app_with_bloc/widgets/last_update_widget.dart';
 import 'package:flutter_weather_app_with_bloc/widgets/location_widget.dart';
 import 'package:flutter_weather_app_with_bloc/widgets/max_min_temp_widget.dart';
@@ -10,40 +12,76 @@ class WeatherApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    String? pickedCity = "ANKARA";
-    
+    final _weatherBloc = BlocProvider.of<WeatherBloc>(context);
+    String pickedCity = "ANKARA";
+
     return Scaffold(
       appBar: AppBar(
         backgroundColor: Colors.blue.shade300,
-        title: const Text("weather app", style: TextStyle(color: Colors.white),),
+        title: const Text(
+          "weather app",
+          style: TextStyle(color: Colors.white),
+        ),
         actions: [
-          IconButton(onPressed: () async{
-
-            // selectCity'de pop geriye _textController.text ile veri veriyor bu veriyi await ile bekleyip değişkene atadık
-            pickedCity = await Navigator.push(context, MaterialPageRoute(builder: (context) => const selectCityWidget()));
-          }, icon: const Icon(Icons.search, color: Colors.white,))
+          IconButton(
+              onPressed: () async {
+                // selectCity'de pop geriye _textController.text ile veri veriyor bu veriyi await ile bekleyip değişkene atadık
+                pickedCity = await Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                        builder: (context) => const selectCityWidget()));
+                if (pickedCity != null) {
+                  _weatherBloc.add(FetchWeatherEvent(sehirAdi: pickedCity));
+                }
+              },
+              icon: const Icon(
+                Icons.search,
+                color: Colors.white,
+              ))
         ],
       ),
       body: Center(
-        child: ListView(
-          children: [
-            Padding(
-              padding: const EdgeInsets.all(8.0),
-              child: Center(child: LocationWidget(city: pickedCity!),),
-            ),
-            const Padding(
-              padding: EdgeInsets.all(8.0),
-              child: Center(child: LastUpdateWidget()),
-            ),
-            const Padding(
-              padding: EdgeInsets.all(8.0),
-              child: Center(child: WeatherPictureWidget()),
-            ),
-            const Padding(
-              padding: EdgeInsets.all(8.0),
-              child: Center(child: MaxMinTemperatureWidget()),
-            ),
-          ],
+        child: BlocBuilder<WeatherBloc, WeatherState>(
+          builder: (context, state) {
+
+            if(state is WeatherInitial){
+              return Center(child: Text("şeihr seçiniz"),);
+            }
+            if(state is WeatherLoadingState){
+              return const Center(child:  CircularProgressIndicator());
+            }
+            if(state is WeatherLoadedState){
+              final getirilenWeather = state.weather;
+              
+              return ListView(
+              children: [
+                Padding(
+                  padding: const EdgeInsets.all(8.0),
+                  child: Center(
+                    child: LocationWidget(city: pickedCity!),
+                  ),
+                ),
+                const Padding(
+                  padding: EdgeInsets.all(8.0),
+                  child: Center(child: LastUpdateWidget()),
+                ),
+                const Padding(
+                  padding: EdgeInsets.all(8.0),
+                  child: Center(child: WeatherPictureWidget()),
+                ),
+                const Padding(
+                  padding: EdgeInsets.all(8.0),
+                  child: Center(child: MaxMinTemperatureWidget()),
+                ),
+              ],
+            );
+            }
+
+            if(state is WeatherErrorState){
+              return const Center(child: Text("hata oluştu"),);
+            }
+            return Text("hiçbir şey olmadı");
+          },
         ),
       ),
     );
