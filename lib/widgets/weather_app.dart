@@ -12,6 +12,7 @@ class WeatherApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+
     final _weatherBloc = BlocProvider.of<WeatherBloc>(context);
     String pickedCity = "ANKARA";
 
@@ -32,6 +33,7 @@ class WeatherApp extends StatelessWidget {
                         builder: (context) => const selectCityWidget()));
                 if (pickedCity != null) {
                   _weatherBloc.add(FetchWeatherEvent(sehirAdi: pickedCity));
+                  print(pickedCity);
                 }
               },
               icon: const Icon(
@@ -45,20 +47,20 @@ class WeatherApp extends StatelessWidget {
           builder: (context, state) {
 
             if(state is WeatherInitial){
-              return Center(child: Text("şeihr seçiniz"),);
+              return Center(child: Text("şehir seçiniz"),);
             }
-            if(state is WeatherLoadingState){
+            else if(state is WeatherLoadingState){
               return const Center(child:  CircularProgressIndicator());
             }
-            if(state is WeatherLoadedState){
-              final getirilenWeather = state.weather;
-              
+            else if(state is WeatherLoadedState){
+              /* final getirilenWeather = state.weather;
+              getirilenWeather.current!.lastUpdated; */
               return ListView(
               children: [
                 Padding(
                   padding: const EdgeInsets.all(8.0),
                   child: Center(
-                    child: LocationWidget(city: pickedCity!),
+                    child: LocationWidget(city: pickedCity),
                   ),
                 ),
                 const Padding(
@@ -77,7 +79,7 @@ class WeatherApp extends StatelessWidget {
             );
             }
 
-            if(state is WeatherErrorState){
+            else if(state is WeatherErrorState){
               return const Center(child: Text("hata oluştu"),);
             }
             return Text("hiçbir şey olmadı");

@@ -15,8 +15,8 @@ class WeatherBloc extends Bloc<WeatherEvent, WeatherState> {
     on<FetchWeatherEvent>((event, emit) async{
       emit(WeatherLoadingState());
       try{
-        final WeatherModel? getirilenWeather = await weatherRepository.getWeather(event.sehirAdi);
-        emit(WeatherLoadedState(weather: getirilenWeather!));
+        final WeatherModel getirilenWeather = await weatherRepository.getWeather(event.sehirAdi);
+        emit(WeatherLoadedState(weather: getirilenWeather));
       }
       catch(e){
         emit(WeatherErrorState());

@@ -3,33 +3,55 @@ import 'dart:convert';
 import 'package:dio/dio.dart';
 import 'package:flutter_weather_app_with_bloc/model/weather_model.dart';
 
-class WeatherApiClient{
+class WeatherApiClient {
   Dio dio = Dio();
-  final String baseUrl = Dio().options.baseUrl = "https://www.metaweather.com";
+  final String baseUrl =
+      "https://api.weatherapi.com/v1/current.json?key=ac37b81b57564fe7bc3161922240403&q=";
 
-  Future<int> getLocationID(String sehirAdi)async{
-    
-    final String sehirUrl = baseUrl + "/api/location/search/?query=" + sehirAdi;
-    final gelenCevap = await dio.get(sehirUrl);
+  Future<String> getLocationName(String sehirAdi) async {
+    try {
+      final String sehirUrl = baseUrl + sehirAdi;
+      final gelenCevap = await dio.get(sehirUrl);
 
-    if(gelenCevap.statusCode != 200){
-      throw Exception("veri getirilemedi");
+      List gelenCevapListe = [];
+
+      if (gelenCevap.statusCode != 200) {
+        throw Exception("veri gelmedi");
+      }
+
+      gelenCevapListe = (gelenCevap.data as List)
+          .map((e) => WeatherModel.fromMap(e))
+          .toList();
+      String gelenSehirAdi = await gelenCevapListe[0]["name"];
+
+      // Future<WeatherModel>
+      //return WeatherModel.fromMap(gelenSehirAdi);
+      return gelenSehirAdi;
+
+      //return gelenSehirAdi;
+    } on DioException catch (e) {
+      return Future.error(e.message.toString());
     }
-
-    final gelenCevapJson = (await jsonDecode(gelenCevap.data)) as List;
-    return gelenCevapJson[0]["woeid"];
-
   }
 
-  Future<WeatherModel> getWeather(int sehirId)async{
-    final havaDurumuUrl = baseUrl + "/api/locator/" + sehirId.toString();
+  Future<WeatherModel> getWeather(String sehir) async {
+    final havaDurumuUrl = baseUrl + sehir;
     final havaDurumuGelenCevap = await dio.get(havaDurumuUrl);
 
-    if(havaDurumuGelenCevap.statusCode != 200){
+    if (havaDurumuGelenCevap.statusCode != 200) {
       throw Exception("hava durumu getirilemedi");
     }
 
-    final havaDurumuGelenCevabinJsonHali = (await jsonDecode(havaDurumuGelenCevap.data));
-    return WeatherModel.fromMap(havaDurumuGelenCevap.data);
+    /*var cevapListe = (havaDurumuGelenCevap.data as List)
+          .map((e) => WeatherModel.fromMap(e))
+          .toList();*/
+
+    var cevapJson = jsonDecode(havaDurumuGelenCevap.data);
+
+    return WeatherModel.fromMap(cevapJson);
+
+    /*final havaDurumuGelenCevabinJsonHali =
+        (await jsonDecode(havaDurumuGelenCevap.data));
+    return WeatherModel.fromMap(havaDurumuGelenCevabinJsonHali);*/
   }
 }
