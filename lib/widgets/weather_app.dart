@@ -44,6 +44,7 @@ class WeatherApp extends StatelessWidget {
       ),
       body: Center(
         child: BlocBuilder<WeatherBloc, WeatherState>(
+          bloc: _weatherBloc,
           builder: (context, state) {
 
             if(state is WeatherInitial){
@@ -53,14 +54,14 @@ class WeatherApp extends StatelessWidget {
               return const Center(child:  CircularProgressIndicator());
             }
             else if(state is WeatherLoadedState){
-              /* final getirilenWeather = state.weather;
-              getirilenWeather.current!.lastUpdated; */
+              final getirilenWeather = state.weather;
+              getirilenWeather.current!.lastUpdated;
               return ListView(
               children: [
                 Padding(
                   padding: const EdgeInsets.all(8.0),
                   child: Center(
-                    child: LocationWidget(city: pickedCity),
+                    child: LocationWidget(city: getirilenWeather.location!.name.toString()),
                   ),
                 ),
                 const Padding(
